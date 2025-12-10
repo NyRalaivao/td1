@@ -29,9 +29,6 @@ public class DataRetriever {
         return categories;
     }
 
-    /**
-     * Pagination 1-indexed: page=1,size=10 => offset 0 LIMIT 10
-     */
     public List<Product> getProductList(int page, int size) {
         List<Product> products = new ArrayList<>();
         if (page < 1 || size < 1) return products;
@@ -76,20 +73,13 @@ public class DataRetriever {
         return products;
     }
 
-    /**
-     * Filtrage selon critères (sans pagination).
-     * Si un critère est null, il est ignoré.
-     */
     public List<Product> getProductsByCriteria(String productName, String categoryName,
                                                Instant creationMin, Instant creationMax) {
         // Delegate to the paginated version with page/size = fetch all (no pagination)
         return getProductsByCriteria(productName, categoryName, creationMin, creationMax, -1, -1);
     }
 
-    /**
-     * Filtrage + pagination. If page<=0 or size<=0 => no pagination (return all results).
-     * Important: filter first, then paginate (SQL WHERE then LIMIT/OFFSET)
-     */
+
     public List<Product> getProductsByCriteria(String productName, String categoryName,
                                                Instant creationMin, Instant creationMax,
                                                int page, int size) {
@@ -101,7 +91,6 @@ public class DataRetriever {
                 .append("  (SELECT name FROM product_category pc WHERE pc.product_id = p.id ORDER BY id LIMIT 1) AS c_name ")
                 .append("FROM product p ");
 
-        // for category filter we will use EXISTS subquery
         List<Object> params = new ArrayList<>();
         boolean whereAdded = false;
 
